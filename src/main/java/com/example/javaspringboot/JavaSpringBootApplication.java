@@ -1,13 +1,13 @@
 package com.example.javaspringboot;
 
-//import com.example.javaspringboot.Model.User.Role;
+//import com.example.javaspringboot.Model.User.User.Role;
 //import com.example.javaspringboot.Service.User.RoleService;
 //import com.example.javaspringboot.Service.User.UserService;
-import com.example.javaspringboot.Model.EnumRole;
-import com.example.javaspringboot.Model.Role;
-import com.example.javaspringboot.Repo.RoleRepository;
-import com.example.javaspringboot.Repo.UserRepository;
-import com.example.javaspringboot.Service.MyUserDetailsService;
+import com.example.javaspringboot.Model.User.EnumRole;
+import com.example.javaspringboot.Model.User.Role;
+import com.example.javaspringboot.Repo.User.RoleRepository;
+import com.example.javaspringboot.Repo.User.UserRepository;
+import com.example.javaspringboot.Service.User.MyUserDetailsService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EnableJpaRepositories(basePackageClasses =  UserRepository.class)
+//@EnableJpaRepositories(basePackageClasses =  UserRepository.class)
 public class JavaSpringBootApplication {
 
     public static void main(String[] args) {
