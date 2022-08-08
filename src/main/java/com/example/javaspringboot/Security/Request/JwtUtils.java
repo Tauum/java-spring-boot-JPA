@@ -4,7 +4,7 @@ import java.util.Date;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-import com.example.javaspringboot.Model.User.MyUserDetails;
+import com.example.javaspringboot.User.Model.MyUserDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

@@ -7,7 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.example.javaspringboot.Service.User.MyUserDetailsService;
+import com.example.javaspringboot.User.Service.MyUserDetailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,10 +37,13 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails,null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                SecurityContextHolder.getContext().setAuthentication(authentication); // throws error here
+                System.out.println("a");
             }
         }
-        catch (Exception e) { logger.error("Cannot set user authentication: {}", e); }
+        catch (Exception e) { logger.error("Cannot set user authentication: {}", e);
+            System.out.println(e);
+        }
         filterChain.doFilter(request, response);
     }
 
