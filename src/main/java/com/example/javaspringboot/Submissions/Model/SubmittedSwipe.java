@@ -1,6 +1,6 @@
 package com.example.javaspringboot.Submissions.Model;
 
-import com.example.javaspringboot.Games.Model.Swipe;
+import com.example.javaspringboot.Activities.Model.Swipe;
 import com.example.javaspringboot.User.Model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;

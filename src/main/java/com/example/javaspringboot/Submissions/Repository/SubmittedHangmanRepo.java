@@ -16,4 +16,7 @@ public interface SubmittedHangmanRepo extends JpaRepository<SubmittedHangman, Lo
     //    https://stackoverflow.com/questions/70701668/springboot-list-of-objects-with-child-entities-not-returned/70701882#70701882
     @EntityGraph(attributePaths = {"user"})
     List<SubmittedHangman> findAllByUserIdOrderByGeneratedDateDesc(Long id);
+
+    @EntityGraph(attributePaths = {"user"})
+    List<SubmittedHangman> findAllByHangmanTitleContains(String title);
 }

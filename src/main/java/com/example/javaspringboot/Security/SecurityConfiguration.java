@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
 
 @Configuration
 @EnableWebSecurity
@@ -56,20 +57,33 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.cors().and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests().antMatchers("/auth/**", "/Users/add",
-                "/Modules/getAllModuleRegisterDTO", "/Modules/getAllModuleRegisterDTO/**",
-                "/Updates", "/Updates/Recent").permitAll()
+
+                .authorizeRequests().antMatchers("/Auth/**", "/Users/add", "/Users/initialRegister/**" ,"/Users/getUserProfileAndStatsById/**",
+                "/Modules/dto", "/Modules/dto/byCode/**",
+                "/Updates", "/Updates/Recent", "/Test/all", "/Extras/newestOrder-hideHidden", "/Extras/containingTitle-hideHidden/*" ,"/Extras/viewed/*", "/ContactForms/add"
+                ).permitAll()
 
 
-                .antMatchers(GET, "/Modules", "/Modules/**", "/Modules/**/**", "/Users/**")
-                .hasAnyAuthority("STUDENT","UNDEFINED", "STAFF", "ADMIN")
 
-                .antMatchers("/Users/getUserProfileByEmail", "/QuickNotes", "/QuickNotes/**", "/QuickNotes/**/**")
-                .hasAnyAuthority("STUDENT","UNDEFINED", "STAFF", "ADMIN")
+                .antMatchers(GET, "/Modules", "/Modules/**", "/Modules/**/**", "/Users/**", "/Auth/whoami")
+                .hasAnyAuthority("ROLE_STUDENT","ROLE_UNDEFINED", "ROLE_STAFF", "ROLE_ADMIN")
 
-                .antMatchers("/**").hasAnyAuthority("ADMIN", "STAFF")
+                .antMatchers( "/SubmittedPropagates/add", "/SubmittedPropagates/vote/*/*")
+                .hasAnyAuthority("ROLE_STUDENT","ROLE_UNDEFINED", "ROLE_STAFF", "ROLE_ADMIN")
 
-                .antMatchers("/test/**").permitAll()
+                .antMatchers("/Users/getUserProfileByEmail", "/QuickNotes", "/QuickNotes/**", "/QuickNotes/**/**",
+                "/Test/user"
+                ).hasAnyAuthority("ROLE_STUDENT","ROLE_UNDEFINED", "ROLE_STAFF", "ROLE_ADMIN")
+//                .hasAnyAuthority("STUDENT","UNDEFINED", "STAFF", "ADMIN")
+
+                .antMatchers("/**", "/**/**", "/**/**/**"
+//                        "/User", "/ContactForms", "/Extras", "/Feedbacks", "/Modules", "/QuickNotes", "/Updates",
+//                        "/Hangmen", "/Matches", "/Propagates", "/Quizzes", "/Swipes",
+//                        "/SubmittedHangmen", "/SubmittedMatches","SubmittedPropagates","/SubmittedQuestion","/SubmittedQuizzes","/SubmittedSwipes",
+//                        "/Test/staff"
+                ).hasAnyAuthority("ROLE_STAFF", "ROLE_ADMIN")
+
+                .antMatchers("/Test/admin").hasAnyAuthority("ROLE_ADMIN")
 
                 .anyRequest().authenticated();
 

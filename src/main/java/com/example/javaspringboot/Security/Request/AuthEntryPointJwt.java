@@ -29,7 +29,7 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         final Map<String, Object> body = new HashMap<>();
-        System.out.println("authEntryPointJWT" + authException);
+
         if (authException.getMessage() == "User is disabled"){
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             body.put("status", HttpServletResponse.SC_FORBIDDEN);
@@ -38,7 +38,6 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
         }
-
 
         body.put("error", "Unauthorized");
         body.put("message", authException.getMessage());

@@ -2,6 +2,7 @@ package com.example.javaspringboot.Submissions.Service;
 
 import com.example.javaspringboot.Submissions.Model.SubmittedMatch;
 import com.example.javaspringboot.Submissions.Model.SubmittedPropagate;
+import com.example.javaspringboot.Submissions.Model.SubmittedQuiz;
 import com.example.javaspringboot.Submissions.Repository.SubmittedPropagateRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,5 +39,15 @@ public class SubmittedPropagateService {
 
     public List<SubmittedPropagate> findAllByUserId(Long id) {
         return submittedPropagateRepo.findAllByUserIdOrderByGeneratedDateDesc(id);
+    }
+
+    public boolean patchRating(Boolean rating, Long id) {
+        SubmittedPropagate find = findSubmittedPropagateById(id);
+        if ( find != null){
+            find.setRating(rating);
+            submittedPropagateRepo.save(find);
+            return true;
+        }
+        return false;
     }
 }

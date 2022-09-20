@@ -29,20 +29,31 @@ public class JwtUtils {
 
     public String getJwtFromCookies(HttpServletRequest request) {
         Cookie cookie = WebUtils.getCookie(request, jwtCookie);
-        if (cookie != null) {
-            return cookie.getValue();
-        } else {
-            return null;
-        }
+        if (cookie != null) { return cookie.getValue(); }
+        else {  return null; }
     }
 
     public ResponseCookie generateJwtCookie(MyUserDetails userPrincipal) {
         String jwt = generateTokenFromUsername(userPrincipal.getEmail());
-        return ResponseCookie.from(jwtCookie, jwt).path("/").maxAge(24 * 60 * 60).httpOnly(true).build();
+        return ResponseCookie.from(jwtCookie, jwt)
+                .path("/")
+                .maxAge(24 * 60 * 60)
+                .httpOnly(true)
+                .sameSite("None") // None, Lax, Strict,
+//                .domain("localhost") //192.168.2.128 //edowl.online
+                .secure(true)
+                .build();
     }
 
     public ResponseCookie getCleanJwtCookie() {
-        return ResponseCookie.from(jwtCookie, null).path("/").build();
+        return ResponseCookie.from(jwtCookie, null)
+                .path("/")
+                .maxAge(1)
+                .httpOnly(true)
+                .sameSite("None") // None, Lax, Strict,
+//                .domain("localhost") //192.168.2.128 //edowl.online
+                .secure(true)
+                .build();
     }
 
     public String getEmailFromJwtToken(String token) {

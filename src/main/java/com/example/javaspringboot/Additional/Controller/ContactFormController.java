@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600, allowCredentials = "true")
 @RestController
 @RequestMapping("/ContactForms")
 public class ContactFormController {
@@ -23,20 +24,26 @@ public class ContactFormController {
     public ResponseEntity<List<ContactForm>> getAllContactForm()
     {
         List<ContactForm> ContactForms = ContactFormService.findAllOrderByDate();
-        return new ResponseEntity<>(ContactForms, HttpStatus.OK); //ok is 200 status code
+        return new ResponseEntity<>(ContactForms, HttpStatus.OK);
     }
 
+//    @PostMapping("/add")
+//    public ResponseEntity<ContactForm> addContactForm(@RequestBody ContactForm ContactForm)
+//    {
+//        ContactForm newContactForm = ContactFormService.addContactForm(ContactForm);
+//        return new ResponseEntity<>(newContactForm, HttpStatus.CREATED);
+//    }
+
     @PostMapping("/add")
-    public ResponseEntity<ContactForm> addContactForm(@RequestBody ContactForm ContactForm)
+    public ResponseEntity<ContactForm> addContactForm(@RequestBody ContactForm contactForm)
     {
-        ContactForm newContactForm = ContactFormService.addContactForm(ContactForm);
-        return new ResponseEntity<>(ContactForm, HttpStatus.CREATED); //ok is 200 status code
+        ContactForm newContactForm = ContactFormService.addContactForm(contactForm);
+        return new ResponseEntity<>(newContactForm, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteContactForm(@PathVariable("id") Long id)
     {
-        ContactForm attempt = ContactFormService.findContactFormById(id);
         ContactFormService.deleteContactForm(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }

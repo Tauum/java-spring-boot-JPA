@@ -2,13 +2,22 @@ package com.example.javaspringboot.Additional.Controller;
 
 import com.example.javaspringboot.Additional.Model.Module;
 import com.example.javaspringboot.Additional.Model.ModuleRegisterDto;
+import com.example.javaspringboot.Additional.Model.ModuleRegisterDtoRole;
+import com.example.javaspringboot.Additional.Model.SecureModule;
 import com.example.javaspringboot.Additional.Service.ModuleService;
+import com.example.javaspringboot.User.Model.User;
+import com.example.javaspringboot.User.Model.UserSumarised;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+
+@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600, allowCredentials = "true")
 @RestController
 @RequestMapping("/Modules")
 public class ModuleController {
@@ -16,21 +25,28 @@ public class ModuleController {
 
     public ModuleController(ModuleService moduleService) {this.moduleService = moduleService; }
 
-    @GetMapping
+    @GetMapping()
     public ResponseEntity<List<Module>> getAllModules()
     {
         List<Module> modules = moduleService.findAll();
         return new ResponseEntity<>(modules, HttpStatus.OK); //ok is 200 status code
     }
 
-    @GetMapping("/getAllModuleRegisterDTO")
+    @GetMapping("/secure")
+    public ResponseEntity<List<SecureModule>> getAllSecureModules()
+    {
+        List<SecureModule> secureModules = moduleService.findAllSecure();
+        return new ResponseEntity<>(secureModules, HttpStatus.OK); //ok is 200 status code
+    }
+
+    @GetMapping("/dto")
     public ResponseEntity<List<ModuleRegisterDto>> getAllModulesRegisterDTO()
     {
         List<ModuleRegisterDto> modules = moduleService.findAllModulesRegisterDTO();
         return new ResponseEntity<>(modules, HttpStatus.OK); //ok is 200 status code
     }
 
-    @GetMapping("/getModuleRegisterDTO/byCode/{code}")
+    @GetMapping("/dto/byCode/{code}")
     public ResponseEntity<List<ModuleRegisterDto>> getModulesRegisterDTOByCode(@PathVariable("code") String code)
     {
         List<ModuleRegisterDto> modules = moduleService.findModulesRegisterDTOContainingCode(code);
@@ -44,6 +60,13 @@ public class ModuleController {
         return new ResponseEntity<>(modules, HttpStatus.OK); //ok is 200 status code
     }
 
+    @GetMapping("/secure/byCode/{code}")
+    public ResponseEntity<List<SecureModule>> getSecureModuleByCode(@PathVariable("code") String code)
+    {
+        List<SecureModule> secureModules = moduleService.findSecureModuleContainingCode(code);
+        return new ResponseEntity<>(secureModules, HttpStatus.OK); //ok is 200 status code
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Module> getModuleByID(@PathVariable("id") Long id)
     {
@@ -51,36 +74,63 @@ public class ModuleController {
         return new ResponseEntity<>(module, HttpStatus.OK); //ok is 200 status code
     }
 
+    @GetMapping("/secure/{id}")
+    public ResponseEntity<SecureModule> getSecureModuleByID(@PathVariable("id") Long id)
+    {
+        SecureModule secureModule = moduleService.findSecureModuleById(id);
+        return new ResponseEntity<>(secureModule, HttpStatus.OK); //ok is 200 status code
+    }
 
-    @GetMapping("/ForUser/{id}")
-    public ResponseEntity<List<Module>> getForUser(@PathVariable("id") Long id)
+    @GetMapping("/dto/forUser/{id}")
+    public ResponseEntity<List<ModuleRegisterDtoRole>> getModuleDTOForUser(@PathVariable("id") Long id)
+    {
+        List<ModuleRegisterDtoRole> modulesDTO = moduleService.findAllModulesDTOForUser(id);
+        return new ResponseEntity<>(modulesDTO, HttpStatus.OK); //ok is 200 status code
+    }
+
+    @GetMapping("/secure/forUser/{id}")
+    public ResponseEntity<List<SecureModule>> getSecureModuleForUser(@PathVariable("id") Long id)
+    {
+        List<SecureModule> secureModules = moduleService.findAllSecureModulesForUser(id);
+        return new ResponseEntity<>(secureModules, HttpStatus.OK); //ok is 200 status code
+    }
+
+    @GetMapping("/forUser/{id}")
+    public ResponseEntity<List<Module>> getModuleForUser(@PathVariable("id") Long id)
     {
         List<Module> modules = moduleService.findAllModulesForUser(id);
         return new ResponseEntity<>(modules, HttpStatus.OK); //ok is 200 status code
     }
 
-    @PutMapping("/AddStudentToModule/{moduleId}/{userId}")
+    @GetMapping("/RandomActivityforUser/{id}")
+    public ResponseEntity<?> getRandomActivityForUser(@PathVariable("id") Long id)
+    {
+        var activity = moduleService.findRandomActivityForUser(id);
+        return new ResponseEntity<>(activity, HttpStatus.OK); //ok is 200 status code
+    }
+
+    @PutMapping("/addStudent/{moduleId}/{userId}")
     public ResponseEntity<Module> addStudentToModule(@PathVariable("moduleId") Long moduleId, @PathVariable("userId") Long userId)
     {
         Module attempt = moduleService.addStudentToModule(moduleId, userId);
         return new ResponseEntity<>(attempt, HttpStatus.OK); //ok is 200 status code
     }
 
-    @PutMapping("/AddAdminToModule/{moduleId}/{userId}")
+    @PutMapping("/addAdmin/{moduleId}/{userId}")
     public ResponseEntity<Module> addAdminToModule(@PathVariable("moduleId") Long moduleId, @PathVariable("userId") Long userId)
     {
         Module attempt = moduleService.addAdminToModule(moduleId, userId);
         return new ResponseEntity<>(attempt, HttpStatus.OK); //ok is 200 status code
     }
 
-    @PutMapping("/RemoveStudentFromModule/{moduleId}/{userId}")
+    @PutMapping("/removeStudent/{moduleId}/{userId}")
     public ResponseEntity<Module> RemoveStudentFromModule(@PathVariable("moduleId") Long moduleId, @PathVariable("userId") Long userId)
     {
         Module attempt = moduleService.removeStudentFromModule(moduleId, userId);
         return new ResponseEntity<>(attempt, HttpStatus.OK); //ok is 200 status code
     }
 
-    @PutMapping("/RemoveAdminFromModule/{moduleId}/{userId}")
+    @PutMapping("/removeAdmin/{moduleId}/{userId}")
     public ResponseEntity<Module> RemoveAdminFromModule(@PathVariable("moduleId") Long moduleId, @PathVariable("userId") Long userId)
     {
         Module attempt = moduleService.removeAdminFromModule(moduleId, userId);

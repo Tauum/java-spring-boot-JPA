@@ -12,10 +12,11 @@ public interface SubmittedPropagateRepo extends JpaRepository<SubmittedPropagate
 
     void deleteSubmittedQuizById(Long id);
 
+    @EntityGraph(attributePaths = {"user", "propagate", "submittedPropagateAttempts"})
     SubmittedPropagate findSubmittedPropagateById(Long id);
 
     //    https://stackoverflow.com/questions/70701668/springboot-list-of-objects-with-child-entities-not-returned/70701882#70701882
-    @EntityGraph(attributePaths = {"user", "Propagate"})
+    @EntityGraph(attributePaths = {"user", "propagate", "submittedPropagateAttempts"})
     List<SubmittedPropagate> findAllByUserIdOrderByGeneratedDateDesc(Long id);
 
     void deleteSubmittedPropagateById(Long id);

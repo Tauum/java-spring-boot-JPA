@@ -3,7 +3,13 @@ package com.example.javaspringboot.User.Service;
 
 import com.example.javaspringboot.Additional.Model.Module;
 import com.example.javaspringboot.Additional.Model.ModuleRegisterDto;
+import com.example.javaspringboot.Additional.Model.ModuleRegisterDtoRole;
 import com.example.javaspringboot.Additional.Service.ModuleService;
+import com.example.javaspringboot.Submissions.Model.Statistics;
+import com.example.javaspringboot.Submissions.Model.SubmittedHangman;
+import com.example.javaspringboot.Submissions.Service.SubmittedHangmanService;
+import com.example.javaspringboot.Submissions.Service.SubmittedMatchService;
+import com.example.javaspringboot.Submissions.Service.SubmittedQuizService;
 import com.example.javaspringboot.User.Model.*;
 import com.example.javaspringboot.User.Repository.RoleRepository;
 import com.example.javaspringboot.User.Repository.UserRepository;
@@ -12,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,11 +30,20 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private ModuleService moduleService;
 
-    public UserService(UserRepository userRepo, RoleRepository roleRepo, PasswordEncoder passwordEncoder, @Lazy ModuleService moduleService) {
+    private SubmittedMatchService sMService;
+    private SubmittedQuizService sQService;
+    private SubmittedHangmanService sHService;
+
+    public UserService(UserRepository userRepo, RoleRepository roleRepo, PasswordEncoder passwordEncoder,
+                       @Lazy ModuleService moduleService,
+                       SubmittedMatchService sMService, SubmittedQuizService sQService, SubmittedHangmanService sHService) {
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
         this.passwordEncoder = passwordEncoder;
         this.moduleService = moduleService;
+        this.sMService = sMService;
+        this.sQService = sQService;
+        this.sHService = sHService;
     }
 
 // FIGURE OUT IF THESE SKEANY THROWS ARE RELEVANT IN MYUSERDETAILSSERVICE
@@ -103,14 +119,14 @@ public class UserService {
             find.setLastName(initialRegister.getLastName());
             if (initialRegister.getUserInstitutionId() != null){ find.setUserInstitutionId(initialRegister.getUserInstitutionId()); }
             if (initialRegister.getAvatar() != null){ find.setAvatar(initialRegister.getAvatar()); }
-            else{ find.setAvatar(0);}
+            else{ find.setAvatar(0); }
             find.setInitialRegister(true);
 
             userRepo.save(find);
-            if (initialRegister.getModuleRegisterDtoList() != null){ // this doesnt work
-                for (ModuleRegisterDto moduleRegisterDto: initialRegister.getModuleRegisterDtoList() ) {
-                    Module foundModule = moduleService.findFirstModuleContainingCode(moduleRegisterDto.getCode());
-                    moduleService.addStudentToModule(foundModule.getId(), find.getId());
+            if (initialRegister.getModulesSelected() != null){ // this doesnt work
+                for (String moduleSelected:  initialRegister.getModulesSelected() ) {
+                    Module foundModule = moduleService.findFirstModuleContainingCode(moduleSelected);
+                    if (foundModule != null) { moduleService.addStudentToModule(foundModule.getId(), find.getId()); }
                 }
             }
 
@@ -238,22 +254,49 @@ public class UserService {
     public UserProfile findUserProfileUserByEmail(String email) {
         User user = userRepo.findUserByEmail(email);
         if (user != null){
-            UserProfile userProfile = new UserProfile();
-            userProfile.setId(user.getId());
-            userProfile.setEmail(user.getEmail());
-            userProfile.setCreatedOn(user.getCreatedOn());
-            userProfile.setUpdatedOn(user.getUpdatedOn());
-            userProfile.setAvatar(user.getAvatar());
-            userProfile.setDob(user.getDob());
-            userProfile.setFirstName(user.getFirstName());
-            userProfile.setLastName(user.getLastName());
-            userProfile.setUserInstitutionId(user.getUserInstitutionId());
-            userProfile.setTermsAndConditions(user.isTermsAndConditions());
-            userProfile.setInitialRegister(user.isInitialRegister());
-            userProfile.setEnabled(user.isEnabled());
-            userProfile.setRoles(user.getRoles());
+            UserProfile userProfile = new UserProfile(
+                    user.getId(),  user.getEmail(), user.getUserInstitutionId(),
+                    user.getFirstName(), user.getLastName(),
+                    user.getCreatedOn(),  user.getUpdatedOn(), user.getDob(),
+                    user.isTermsAndConditions(), user.isInitialRegister(),
+                    user.getAvatar(), user.isEnabled(), user.getRoles()
+            );
+            List<ModuleRegisterDtoRole> modules  = moduleService.findAllModulesRegisterDTOForUser(user);
+            userProfile.setModules(modules);
 
-            List<ModuleRegisterDto> modules  = moduleService.findAllModulesRegisterDTOForUserId(user.getId());
+            return userProfile;
+        }
+        return null;
+    }
+//        public UserProfile findUserProfileUserByEmail(String email) {
+//        User user = userRepo.findUserByEmail(email);
+//        if (user != null){
+//            UserProfile userProfile = new UserProfile(
+//                    user.getId(),  user.getEmail(), user.getUserInstitutionId(),
+//                    user.getFirstName(), user.getLastName(),
+//                    user.getCreatedOn(),  user.getUpdatedOn(), user.getDob(),
+//                    user.isTermsAndConditions(), user.isInitialRegister(),
+//                    user.getAvatar(), user.isEnabled(), user.getRoles()
+//            );
+//            List<ModuleRegisterDtoRole> modules  = moduleService.findAllModulesRegisterDTOForUser(user);
+//            userProfile.setModules(modules);
+//
+//            return userProfile;
+//        }
+//        return null;
+//    }
+
+    public UserProfile findUserProfileUserById(Long id) {
+        User user = userRepo.findUserById(id);
+        if (user != null){
+            UserProfile userProfile = new UserProfile(
+                    user.getId(),  user.getEmail(), user.getUserInstitutionId(),
+                    user.getFirstName(), user.getLastName(),
+                    user.getCreatedOn(),  user.getUpdatedOn(), user.getDob(),
+                    user.isTermsAndConditions(), user.isInitialRegister(),
+                    user.getAvatar(), user.isEnabled(), user.getRoles()
+            );
+            List<ModuleRegisterDtoRole> modules  = moduleService.findAllModulesRegisterDTOForUser(user);
             userProfile.setModules(modules);
 
             return userProfile;
@@ -261,4 +304,95 @@ public class UserService {
         return null;
     }
 
+    public UserProfileAndStats findUserProfileAndStatsByEmail(String email) {
+        UserProfile uP = findUserProfileUserByEmail(email);
+        if (uP != null){
+
+            UserProfileAndStats userProfileAndStats = new UserProfileAndStats(
+                    uP.getId(), uP.getEmail(), uP.getUserInstitutionId(),
+                    uP.getFirstName(), uP.getLastName(),
+                    uP.getCreatedOn(), uP.getUpdatedOn(), uP.getDob(),
+                    uP.isTermsAndConditions(), uP.isInitialRegister(),
+                    uP.getAvatar(), uP.isEnabled(), uP.getRoles(), uP.getModules()
+            );
+
+            List<Statistics> statisticsList = new ArrayList<>();
+            var matches = sMService.getStatisticsForUser(uP.getId());
+            if (matches != null){ statisticsList.add(matches); }
+            var quizzes =  sQService.getStatisticsForUser(uP.getId());
+            if (quizzes != null){ statisticsList.add(quizzes); }
+            var hangmen =  sHService.getStatisticsForUser(uP.getId());
+            if (hangmen != null){ statisticsList.add(hangmen); }
+
+            userProfileAndStats.setStatisticsList(statisticsList);
+            return userProfileAndStats;
+        }
+        return null;
+    }
+
+    public UserProfileAndStats findUserProfileAndStatsById(Long id) {
+        UserProfile uP = findUserProfileUserById(id);
+        if (uP != null){
+            UserProfileAndStats userProfileAndStats = new UserProfileAndStats(
+                    uP.getId(), uP.getEmail(), uP.getUserInstitutionId(),
+                    uP.getFirstName(), uP.getLastName(),
+                    uP.getCreatedOn(), uP.getUpdatedOn(), uP.getDob(),
+                    uP.isTermsAndConditions(), uP.isInitialRegister(),
+                    uP.getAvatar(), uP.isEnabled(), uP.getRoles(), uP.getModules()
+            );
+            List<Statistics> statisticsList = new ArrayList<>();
+            var matches = sMService.getStatisticsForUser(uP.getId());
+            if (matches != null){ statisticsList.add(matches); }
+            var quizzes =  sQService.getStatisticsForUser(uP.getId());
+            if (quizzes != null){ statisticsList.add(quizzes); }
+            var hangmen =  sHService.getStatisticsForUser(uP.getId());
+            if (hangmen != null){ statisticsList.add(hangmen); }
+
+            userProfileAndStats.setStatisticsList(statisticsList);
+            return userProfileAndStats;
+        }
+        return null;
+    }
+
+    public List<UserProfile> findAllUserProfiles() {
+        List<User> users = userRepo.findAll();
+        List<UserProfile> userProfiles = new ArrayList<>();
+        for(User user : users){
+            try {
+                UserProfile userProfile = new UserProfile(
+                        user.getId(),  user.getEmail(), user.getUserInstitutionId(),
+                        user.getFirstName(), user.getLastName(),
+                        user.getCreatedOn(),  user.getUpdatedOn(), user.getDob(),
+                        user.isTermsAndConditions(), user.isInitialRegister(),
+                        user.getAvatar(), user.isEnabled(), user.getRoles()
+                );
+                List<ModuleRegisterDtoRole> modules  = moduleService.findAllModulesRegisterDTOForUser(user);
+                userProfile.setModules(modules);
+                userProfiles.add(userProfile);
+            }
+            catch(Error err){}
+        }
+        return userProfiles;
+    }
+
+//    public List<UserProfile> findAllUserProfiles() {
+//        List<User> users = userRepo.findAll();
+//        List<UserProfile> userProfiles = new ArrayList<>();
+//        for(User user : users){
+//            try {
+//                UserProfile userProfile = new UserProfile(
+//                        user.getId(),  user.getEmail(), user.getUserInstitutionId(),
+//                        user.getFirstName(), user.getLastName(),
+//                        user.getCreatedOn(),  user.getUpdatedOn(), user.getDob(),
+//                        user.isTermsAndConditions(), user.isInitialRegister(),
+//                        user.getAvatar(), user.isEnabled(), user.getRoles()
+//                );
+//                List<ModuleRegisterDto> modules  = moduleService.findAllModulesRegisterDTOForUserId(user.getId());
+//                userProfile.setModules(modules);
+//                userProfiles.add(userProfile);
+//            }
+//            catch(Error err){}
+//        }
+//        return userProfiles;
+//    }
 }

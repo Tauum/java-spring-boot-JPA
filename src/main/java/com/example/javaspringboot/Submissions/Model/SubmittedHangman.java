@@ -24,6 +24,7 @@ public class SubmittedHangman {
     private float hangmanValue;
     public String hangmanTitle;
     public Long hangmanId;
+    public boolean rating;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinColumn(name = "user_id")

@@ -14,8 +14,11 @@ public interface SubmittedQuizRepo extends JpaRepository<SubmittedQuiz, Long> {
 
     SubmittedQuiz findSubmittedQuizById(Long id);
 
-//    https://stackoverflow.com/questions/70701668/springboot-list-of-objects-with-child-entities-not-returned/70701882#70701882
-    @EntityGraph(attributePaths = {"user", "submittedQuestions"})
+    //    https://stackoverflow.com/questions/70701668/springboot-list-of-objects-with-child-entities-not-returned/70701882#70701882
+    @EntityGraph(attributePaths = {"user", "submittedQuestions", "quiz"})
     List<SubmittedQuiz> findAllByUserIdOrderByGeneratedDateDesc(Long id);
+
+    @EntityGraph(attributePaths = {"user", "submittedQuestions", "quiz"})
+    List<SubmittedQuiz> findAllByQuizTitleContains(String title);
 }
 

@@ -1,16 +1,19 @@
 package com.example.javaspringboot.Submissions.Controller;
 
 
+import com.example.javaspringboot.Submissions.Model.Statistics;
 import com.example.javaspringboot.Submissions.Model.SubmittedMatch;
 import com.example.javaspringboot.Submissions.Service.SubmittedMatchService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/SubmittedMatches")
+@CrossOrigin
 public class SubmittedMatchController {
     private final SubmittedMatchService submittedMatchService;
 
@@ -38,6 +41,17 @@ public class SubmittedMatchController {
         return new ResponseEntity<>(matchzes, HttpStatus.OK); //ok is 200 status code
     }
 
+    @GetMapping("/getForMatch/{title}")
+    public ResponseEntity<List<SubmittedMatch>> getSubmittedMatchForUser(@PathVariable("title") String title){
+        List<SubmittedMatch> quizzes = submittedMatchService.findAllByMatchTitle(title);
+        return new ResponseEntity<>(quizzes, HttpStatus.OK); //ok is 200 status code
+    }
+
+    @GetMapping("/getSMStatsForUser/{id}")
+    public ResponseEntity<Statistics> getSMStatsForUser(@PathVariable("id") Long userId){
+        return new ResponseEntity<>(submittedMatchService.getStatisticsForUser(userId), HttpStatus.OK);  //ok is 200 status code
+    }
+
     @PostMapping("/add")
     public ResponseEntity<SubmittedMatch> addSubmittedMatch(@RequestBody SubmittedMatch matchSubmitted)
     {
@@ -51,6 +65,15 @@ public class SubmittedMatchController {
         // redo save function here
         SubmittedMatch updateSubmittedMatch = submittedMatchService.updateSubmittedMatch(matchSubmitted);
         return new ResponseEntity<>(updateSubmittedMatch, HttpStatus.OK);  //ok is 200 status code
+    }
+    @PatchMapping("/vote/{id}/{Rating}")
+    public ResponseEntity<Boolean> updateSubmittedMatch(@PathVariable("Rating") Boolean Rating, @PathVariable("id") Long Id)
+    {
+        Boolean out = false;
+        if (submittedMatchService.patchRating(Rating, Id)){
+            out = true;
+        }
+        return new ResponseEntity<>(out, HttpStatus.OK);  //ok is 200 status code
     }
 
     @DeleteMapping("/delete/{id}")

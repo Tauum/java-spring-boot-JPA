@@ -22,6 +22,7 @@ public class SubmittedMatch {
     private LocalDate generatedDate;
     private int timeTaken;
     private float score;
+    public boolean rating;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinColumn(name = "user_id")

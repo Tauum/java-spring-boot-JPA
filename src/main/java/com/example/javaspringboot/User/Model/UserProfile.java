@@ -1,6 +1,7 @@
 package com.example.javaspringboot.User.Model;
 
 import com.example.javaspringboot.Additional.Model.ModuleRegisterDto;
+import com.example.javaspringboot.Additional.Model.ModuleRegisterDtoRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,8 +20,6 @@ public class UserProfile {
     private long id;
 
     private String email;
-
-    private String password;
 
     private String userInstitutionId;
 
@@ -45,5 +44,23 @@ public class UserProfile {
 
     private Set<Role> roles = new HashSet<>();
 
-    private List<ModuleRegisterDto> modules;
+//    private List<ModuleRegisterDto> modules;
+
+    private List<ModuleRegisterDtoRole> modules;
+
+    public UserProfile(long id, String email, String userInstitutionId, String firstName, String lastName, Date createdOn, Date updatedOn, LocalDate dob, boolean termsAndConditions, boolean initialRegister, @Nullable Integer avatar, boolean enabled, Set<Role> roles) {
+        this.id = id;
+        this.email = email;
+        this.userInstitutionId = userInstitutionId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.createdOn = createdOn;
+        this.updatedOn = updatedOn;
+        this.dob = dob;
+        this.termsAndConditions = termsAndConditions;
+        this.initialRegister = initialRegister;
+        this.avatar = avatar;
+        this.enabled = enabled;
+        this.roles = roles;
+    }
 }

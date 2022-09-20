@@ -23,7 +23,7 @@ public class InitialRegister {
     private Integer avatar;
 
     @Nullable
-    private List<ModuleRegisterDto> moduleRegisterDtoList;
+    private List<String> modulesSelected;
 
     private boolean initialRegister;
     private boolean student;

@@ -14,12 +14,10 @@ public class QuickNote {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     public Long userId;
-    public String userEmail;
     private String content;
 
-    public QuickNote(Long userId, String userEmail, String content) {
+    public QuickNote(Long userId, String content) {
         this.userId = userId;
-        this.userEmail = userEmail;
         this.content = content;
     }
 }

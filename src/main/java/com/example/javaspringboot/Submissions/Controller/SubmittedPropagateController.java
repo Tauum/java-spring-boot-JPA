@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600, allowCredentials = "true")
 @RestController
 @RequestMapping("/SubmittedPropagates")
 public class SubmittedPropagateController {
@@ -43,6 +44,16 @@ public class SubmittedPropagateController {
     {
         SubmittedPropagate newSubmittedPropagate = submittedPropagateService.addSubmittedPropagate(PropagateSubmitted);
         return new ResponseEntity<>(newSubmittedPropagate, HttpStatus.CREATED); //ok is 200 status code
+    }
+
+    @PatchMapping("/vote/{id}/{Rating}")
+    public ResponseEntity<Boolean> updateSubmittedQuiz(@PathVariable("Rating") Boolean Rating, @PathVariable("id") Long Id)
+    {
+        Boolean out = false;
+        if (submittedPropagateService.patchRating(Rating, Id)){
+            out = true;
+        }
+        return new ResponseEntity<>(out, HttpStatus.OK);  //ok is 200 status code
     }
 
     @PutMapping("/update")

@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/SubmittedQuestions")
+@RequestMapping("/SubmittedQuestion")
+@CrossOrigin
 public class SubmittedQuestionController {
     private final SubmittedQuestionService submittedQuestionService;
 

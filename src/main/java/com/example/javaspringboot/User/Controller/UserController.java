@@ -3,6 +3,7 @@ package com.example.javaspringboot.User.Controller;
 import com.example.javaspringboot.User.Model.InitialRegister;
 import com.example.javaspringboot.User.Model.User;
 import com.example.javaspringboot.User.Model.UserProfile;
+import com.example.javaspringboot.User.Model.UserProfileAndStats;
 import com.example.javaspringboot.User.Service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -10,8 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
+//@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600, allowCredentials = "true")
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/Users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -25,8 +28,9 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserByID(@PathVariable("id") Long id) {
-        User User = userService.findUserById(id);
-        return new ResponseEntity<>(User, HttpStatus.OK); //ok is 200 status code
+        User attempt = userService.findUserById(id);
+        if (attempt != null){ return new ResponseEntity<>(attempt, HttpStatus.OK); }
+        return new ResponseEntity<>(attempt, HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/getAllInRole")
@@ -35,16 +39,39 @@ public class UserController {
         return new ResponseEntity<>(users, HttpStatus.OK); //ok is 200 status code
     }
 
+    @GetMapping("/getAllUserProfiles")
+    public ResponseEntity<List<UserProfile>> getAllUserProfiles() {
+        List<UserProfile> users = userService.findAllUserProfiles();
+        return new ResponseEntity<>(users, HttpStatus.OK); //ok is 200 status code
+    }
+
     @PostMapping("/getUserProfileByEmail")
     public ResponseEntity<UserProfile> getUserProfileByEmail(@RequestBody User user) {
         UserProfile attempt = userService.findUserProfileUserByEmail(user.getEmail());
-        return new ResponseEntity<>(attempt, HttpStatus.OK);
+        if (attempt != null){ return new ResponseEntity<>(attempt, HttpStatus.OK); }
+        return new ResponseEntity<>(attempt, HttpStatus.NOT_FOUND);
     }
+
+    @PostMapping("/getUserProfileAndStatsByEmail")
+    public ResponseEntity<UserProfileAndStats> getUserProfileAndStatsByEmail(@RequestBody User user) {
+        UserProfileAndStats attempt = userService.findUserProfileAndStatsByEmail(user.getEmail());
+        if (attempt != null){ return new ResponseEntity<>(attempt, HttpStatus.OK); }
+        return new ResponseEntity<>(attempt, HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping("/getUserProfileAndStatsById/{id}")
+    public ResponseEntity<UserProfileAndStats> getUserProfileAndStatsById(@PathVariable("id") Long id) {
+        UserProfileAndStats attempt = userService.findUserProfileAndStatsById(id);
+        if (attempt != null){ return new ResponseEntity<>(attempt, HttpStatus.OK); }
+        return new ResponseEntity<>(attempt, HttpStatus.NOT_FOUND);
+    }
+
 
     @PostMapping("/getByEmail")
     public ResponseEntity<User> getUserByEmail(@RequestBody User user) {
         User attempt = userService.findUserByEmail(user.getEmail());
-        return new ResponseEntity<>(attempt, HttpStatus.OK);
+        if (attempt != null){ return new ResponseEntity<>(attempt, HttpStatus.OK); }
+        return new ResponseEntity<>(attempt, HttpStatus.NOT_FOUND);
     }
 
     @PostMapping("/addRole")

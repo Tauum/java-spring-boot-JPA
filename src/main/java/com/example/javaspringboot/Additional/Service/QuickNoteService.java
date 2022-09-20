@@ -11,7 +11,7 @@ import java.util.List;
 
 @Service
 public class QuickNoteService {
-    private final com.example.javaspringboot.Additional.Repository.QuickNoteRepo QuickNoteRepo;
+    private final QuickNoteRepo QuickNoteRepo;
 
     @Autowired
     public QuickNoteService(QuickNoteRepo QuickNoteRepository) {

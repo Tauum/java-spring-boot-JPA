@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600, allowCredentials = "true")
 @RestController
 @RequestMapping("/Updates")
 public class UpdateController {
@@ -22,6 +23,13 @@ public class UpdateController {
     public ResponseEntity<List<Update>> getAllUpdate()
     {
         List<Update> Updates = UpdateService.findAllOrderByDate();
+        return new ResponseEntity<>(Updates, HttpStatus.OK); //ok is 200 status code
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Update> getUpdate(@PathVariable("id") Long id)
+    {
+        Update Updates = UpdateService.findUpdateById(id);
         return new ResponseEntity<>(Updates, HttpStatus.OK); //ok is 200 status code
     }
 
@@ -41,23 +49,20 @@ public class UpdateController {
         return new ResponseEntity<>(Update, HttpStatus.CREATED); //ok is 200 status code
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Update> updateUpdate(@PathVariable("id") Long id, @RequestBody Update Update)
+    @PutMapping("/update")
+    public ResponseEntity<Update> updateUpdate(@RequestBody Update update)
     {
-        Update attempt = UpdateService.findUpdateById(id);
-        if (attempt != null){
-            attempt.setGeneratedDate(Update.generatedDate);
-            attempt.setContent(Update.content);
-            Update updatedUpdate = UpdateService.updateUpdate(attempt);
-            return new ResponseEntity<>(updatedUpdate, HttpStatus.OK);  //ok is 200 status code
+        Update attempt = UpdateService.updateUpdate(update);
+        if(attempt != null){
+            return new ResponseEntity<>(attempt, HttpStatus.OK);
         }
-        return new ResponseEntity<>(attempt, HttpStatus.BAD_REQUEST);  //ok is 200 status code
+        return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteUpdate(@PathVariable("id") Long id)
     {
-        Update attempt = UpdateService.findUpdateById(id);
         UpdateService.deleteUpdate(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }

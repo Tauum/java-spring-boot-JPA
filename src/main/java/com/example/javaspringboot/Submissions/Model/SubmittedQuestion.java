@@ -15,13 +15,16 @@ public class SubmittedQuestion {
     private Long id;
     private Long questionId;
     private String question;
+    private String explaination;
+    private int questionValue;
+    private float score;
+
     private Long answerId;
     private String answer;
-    private String explaination;
+
     private boolean correct;
-    private float score;
+
     private boolean coppied;
-    private int questionValue;
 
 
     public SubmittedQuestion(Long questionId, String question, Long answerId, String answer, String explaination, boolean correct, float score, boolean coppied, int questionValue) {

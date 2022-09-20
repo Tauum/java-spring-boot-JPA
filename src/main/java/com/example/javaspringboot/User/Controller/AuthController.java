@@ -1,6 +1,5 @@
 package com.example.javaspringboot.User.Controller;
 
-
 import com.example.javaspringboot.User.Model.MyUserDetails;
 import com.example.javaspringboot.User.Model.User;
 import com.example.javaspringboot.Security.Request.JwtUtils;
@@ -17,13 +16,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+//@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600, allowCredentials = "true")
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/Auth")
 public class AuthController {
     @Autowired
     AuthenticationManager authenticationManager;
@@ -42,19 +42,32 @@ public class AuthController {
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@RequestBody User loginRequest) {
-
         Authentication authentication =
                 authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())); // gets error here
-
+                        new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
         ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
         List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority()).collect(Collectors.toList());
 
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+        return  ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .body(userService.findUserProfileUserByEmail(userDetails.getEmail()));
-//                .body(new UserInfoResponse(userDetails.getId(), userDetails.getEmail(), roles));
+    }
+
+    @GetMapping("/whoami")
+    public ResponseEntity<?> whoAmI(HttpServletRequest request) {
+        String jwt = jwtUtils.getJwtFromCookies(request);
+        if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
+            MyUserDetails userDetails = (MyUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (userDetails.isActive()){
+                ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
+                return  ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString()).body(
+                        userService.findUserProfileUserByEmail(
+                                jwtUtils.getEmailFromJwtToken(jwt)
+                        ));
+            }
+        }
+        return  ResponseEntity.status(401).body(new MessageResponse("You're not signed in!"));
     }
 
     @PostMapping("/signup")
@@ -70,6 +83,7 @@ public class AuthController {
     @PostMapping("/signout")
     public ResponseEntity<?> logoutUser() { // something is throwing an error here on sign out
         ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
+        SecurityContextHolder.clearContext();
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(new MessageResponse("You've been signed out!"));
     }
